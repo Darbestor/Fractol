@@ -6,7 +6,7 @@
 #    By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/12/27 16:55:32 by ghalvors          #+#    #+#              #
-#    Updated: 2019/01/31 15:45:20 by ghalvors         ###   ########.fr        #
+#    Updated: 2019/03/19 15:38:02 by ghalvors         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ INCLUDESDIR = includes
 HEADER = $(shell find $(INCLUDESDIR) -type f -name '*.h')
 SUBDIRS = Libft minilibx
 LIB_INC =  -LLibft -lft -lm
-MLX_INC = -Lminilibx -lmlx -framework OpenGL -framework AppKit
+MLX_INC = -Lminilibx -lmlx -framework OpenGL -framework AppKit -framework OpenCL
 PRINTF=test $(VERBOSE)$(TRAVIS) || printf
 
 .PHONY: all

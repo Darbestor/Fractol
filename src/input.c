@@ -6,7 +6,7 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 13:20:22 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/18 18:37:20 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/19 19:08:37 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int		mouse_press(int button, int x, int y, void *param)
                 -0.67 * (0.5 - (double)y / (double)H)) / conf->zoom);
         }
     }
-	paralle_fractal(conf);
+	test_OpenCL(conf);
 	return (0);
 }
 

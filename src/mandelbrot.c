@@ -6,7 +6,7 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 18:00:22 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/18 18:55:13 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/19 18:16:47 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ void	mandelbrot_set(t_conf* conf, t_thread *thread)
 		{
 			thread->c_r = 1.5 * (x - W / 2) / (0.5 * conf->zoom * W) + conf->moveX - 0.5;
 			thread->c_i = (thread->y - H / 2) / (0.5 * conf->zoom * H) + conf->moveY;
+			if (x == 2000 && thread->y == 1000)
+				printf("pthread: %f\t%f\n", thread->c_r, thread->c_i);
 			i = -1;
 			thread->new_i = 0;
 			thread->new_r = 0;
