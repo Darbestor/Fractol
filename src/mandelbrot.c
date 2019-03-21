@@ -6,7 +6,7 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 18:00:22 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/19 18:16:47 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/21 20:35:17 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "../Libft/libft.h"
 #include <math.h>
 
-void	choose_case(t_rgb *rgb, int cs, int v)
+/* void	choose_case(t_rgb *rgb, int cs, int v)
 {
 	if (cs == 0)
 		rgb->rgb = (v << 16) | (rgb->t << 8) | rgb->p;
@@ -94,7 +94,7 @@ void	mandelbrot_set(t_conf* conf, t_thread *thread)
 		thread->y++;
 	}
 	//printf("end vals: X: %d\tY: %d\n", x, thread->y);
-}
+} */
 
 
 // insert above i != iters

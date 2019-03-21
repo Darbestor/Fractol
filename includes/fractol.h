@@ -6,7 +6,7 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:41:42 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/19 20:10:02 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/21 21:25:12 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 # define FRACTOL_H
 # define W 2048
 # define H 1024
-# define THREADS 24
 # define ABS(X) ((X) < 0 ? -(X) : (X))
+#define MAX_SOURCE_SIZE 10000
 # include <stdio.h>
 # include <pthread.h>
 # include <OpenCL/cl.h>
@@ -72,25 +72,14 @@
 
 //
 
-
-typedef struct s_arr
+typedef struct s_setup
 {
-	int			a1;
-	int			b1;
-	int			c1;
-}				t_arr;
-
-typedef struct		s_rgb
-{
-	int				rgb;
-	unsigned char	R;
-	unsigned char	G;
-	unsigned char	B;
-	int				f;
-	int				p;
-	int				q;
-	int				t;
-}					t_rgb;
+	double		zoom;
+	double		moveX;
+	double		moveY;
+	double		iters;
+	int			type;
+}				t_setup;
 
 typedef struct s_conf
 {
@@ -109,50 +98,41 @@ typedef struct s_conf
 	double		moveX;
 	double		moveY;
 	double		iters;
+	t_setup		*setup;
 }				t_conf;
 
-typedef struct s_test
+typedef struct	s_opencl_conf
 {
-	double		zoom;
-	double		moveX;
-	double		moveY;
-	double		iters;
-	int			type;
-}				t_test;
+	char				*source_str;
+	size_t				source_size;
+	cl_platform_id		platform_id;
+	cl_device_id		device_id;
+	cl_uint				ret_num_devices;
+	cl_uint				ret_num_platforms;
+	cl_int				ret;
+	cl_context			context;
+	cl_command_queue	command_queue;
+	cl_mem				image;
+	cl_mem				setup;
+	cl_program			program;
+	cl_kernel			kernel;
+	size_t				global_item_size[2];
+	size_t				local_item_size[2];
+}					t_opencl_conf;
 
-typedef struct s_thread
-{
-	int			x;
-	int			y;
-	int			scr_w;
-	int			scr_h;
-	double		c_r;
-	double		c_i;
-	double		new_r;
-	double		new_i;
-	double		old_r;
-	double		old_i;
-
-	pthread_t	thread;
-	t_conf		*conf;
-// testing colors
-	double	max;
-	double	min;
-	double	distance;
-	/////////////
-}				t_thread;
 
 int		key_press(int keycode, void *param);
 int		close_window(t_conf *param);
 //void	julia_set(t_conf *conf, t_fractal *fract);
-void	mandelbrot_set(t_conf * conf, t_thread *thread);
+//void	mandelbrot_set(t_conf * conf, t_thread *thread);
 //void	burning_ship_set(t_conf *conf, t_fractal *fract);
 //void	launch_fract(t_conf *conf, t_fractal *fract);
 int		mouse_press(int button, int x, int y, void *param);
-int		HSVToRGB(t_rgb *rgb, double h, double s, double v);
+//int		HSVToRGB(t_rgb *rgb, double h, double s, double v);
 //int		mouse_move(int x, int y, void *param);
 int		paralle_fractal(t_conf* conf);
-void	test_OpenCL(t_conf *conf);
+void	render(t_conf *conf);
+int		ft_error(int err);
 
 
 #endif

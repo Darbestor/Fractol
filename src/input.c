@@ -6,7 +6,7 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 13:20:22 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/19 19:08:37 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/21 20:36:05 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,11 @@ void	move_fractal(t_conf *conf, int keycode)
 
 int		mouse_press(int button, int x, int y, void *param)
 {
-	t_conf	*conf;
+	(void)button;
+	(void)x;
+	(void)y;
+	(void)param;
+/* 	t_conf	*conf;
 
 	conf = (t_conf*)param;
 	if (x < W && x >= 0 && y < H && y >= 0)
@@ -47,6 +51,7 @@ int		mouse_press(int button, int x, int y, void *param)
             conf->moveY += (((y > H / 2) ? 0.67 * ((double)y / H - 0.5) :
                 -0.67 * (0.5 - (double)y / (double)H)) / conf->zoom);
             conf->zoom *= 1.5;
+			conf->iters += 2;
         }
         else if (button == 5)
         {
@@ -55,9 +60,10 @@ int		mouse_press(int button, int x, int y, void *param)
                 -(0.5 - (double)x / (double)W)) / conf->zoom);
             conf->moveY -= (((y > H / 2) ? 0.67 * ((double)y / H - 0.5) :
                 -0.67 * (0.5 - (double)y / (double)H)) / conf->zoom);
+			conf->iters -= 2;
         }
     }
-	test_OpenCL(conf);
+	test_OpenCL(conf); */
 	return (0);
 }
 
