@@ -6,11 +6,10 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:47:32 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/21 20:42:41 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/21 22:45:18 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minilibx/mlx.h"
 #include "../includes/fractol.h"
 #include "../Libft/libft.h"
 #include <unistd.h>
@@ -31,6 +30,8 @@ t_conf	*mlx_new()
 		&mlx->endian);
 	mlx->pitch = mlx->pitch / (mlx->bits / 8);
 	mlx->perm_change = 0;
+	if (!(mlx->cl = ft_memalloc(sizeof(t_opencl_conf) * 1)))
+		return (NULL);
 	return (mlx);
 }
 
@@ -103,8 +104,8 @@ int	main(int argc, char **argv)
 //		conf->c_r = -0.7;
 //		conf->c_i = 0.3015;
 		//devices();
+		initialize_program(conf->cl);
 		render(conf);
-			mlx_put_image_to_window(conf->mlx, conf->win, conf->img, 0, 0);
 		mlx_hook(conf->win, 2, 0, &key_press, conf);
 		mlx_hook(conf->win, 17, 0, &close_window, conf);
 		mlx_hook(conf->win, 4, 0, &mouse_press, conf);

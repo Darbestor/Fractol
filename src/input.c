@@ -6,7 +6,7 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 13:20:22 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/21 20:36:05 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/21 22:43:01 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,12 @@
 
 int close_window(t_conf *conf)
 {
+	conf->cl->ret = clFlush(conf->cl->command_queue);
+    conf->cl->ret = clFinish(conf->cl->command_queue);
+    conf->cl->ret = clReleaseKernel(conf->cl->kernel);
+    conf->cl->ret = clReleaseProgram(conf->cl->program);
+    conf->cl->ret = clReleaseCommandQueue(conf->cl->command_queue);
+    conf->cl->ret = clReleaseContext(conf->cl->context);
 	(void)conf;
 	exit(0);
 	return (0);
@@ -35,35 +41,31 @@ void	move_fractal(t_conf *conf, int keycode)
 
 int		mouse_press(int button, int x, int y, void *param)
 {
-	(void)button;
-	(void)x;
-	(void)y;
-	(void)param;
-/* 	t_conf	*conf;
+	t_conf	*conf;
 
 	conf = (t_conf*)param;
 	if (x < W && x >= 0 && y < H && y >= 0)
     {
         if (button == 4)
         {
-            conf->moveX += (((x > W / 2) ? ((double)x / W - 0.5) :
-                -(0.5 - (double)x / (double)W)) / conf->zoom);
-            conf->moveY += (((y > H / 2) ? 0.67 * ((double)y / H - 0.5) :
-                -0.67 * (0.5 - (double)y / (double)H)) / conf->zoom);
-            conf->zoom *= 1.5;
-			conf->iters += 2;
+            conf->setup->moveX += (((x > W / 2) ? ((double)x / W - 0.5) :
+                -(0.5 - (double)x / (double)W)) / conf->setup->zoom);
+            conf->setup->moveY += (((y > H / 2) ? 0.67 * ((double)y / H - 0.5) :
+                -0.67 * (0.5 - (double)y / (double)H)) / conf->setup->zoom);
+           conf->setup->zoom *= 1.5;
+			conf->setup->iters += 2;
         }
         else if (button == 5)
         {
-            conf->zoom /= 1.5;
-            conf->moveX -= (((x > W / 2) ? ((double)x / W - 0.5) :
-                -(0.5 - (double)x / (double)W)) / conf->zoom);
-            conf->moveY -= (((y > H / 2) ? 0.67 * ((double)y / H - 0.5) :
-                -0.67 * (0.5 - (double)y / (double)H)) / conf->zoom);
-			conf->iters -= 2;
+            conf->setup->zoom /= 1.5;
+            conf->setup->moveX -= (((x > W / 2) ? ((double)x / W - 0.5) :
+                -(0.5 - (double)x / (double)W)) / conf->setup->zoom);
+            conf->setup->moveY -= (((y > H / 2) ? 0.67 * ((double)y / H - 0.5) :
+                -0.67 * (0.5 - (double)y / (double)H)) / conf->setup->zoom);
+			conf->setup->iters -= 2;
         }
     }
-	test_OpenCL(conf); */
+	render(conf);
 	return (0);
 }
 

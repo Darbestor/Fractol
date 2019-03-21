@@ -6,7 +6,7 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:41:42 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/21 21:25:12 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/21 22:48:32 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # define ABS(X) ((X) < 0 ? -(X) : (X))
 #define MAX_SOURCE_SIZE 10000
 # include <stdio.h>
+#include "../minilibx/mlx.h"
 # include <pthread.h>
 # include <OpenCL/cl.h>
 
@@ -81,44 +82,47 @@ typedef struct s_setup
 	int			type;
 }				t_setup;
 
-typedef struct s_conf
-{
-	void		*mlx;
-	void		*win;
-	void		*img;
-	int			*data;
-	int			bits;
-	int			pitch;
-	int			endian;
-	int			type;
-	int			perm_change;
-	int			mouse_prev_x;
-	int			mouse_prev_y;
-	double		zoom;
-	double		moveX;
-	double		moveY;
-	double		iters;
-	t_setup		*setup;
-}				t_conf;
-
 typedef struct	s_opencl_conf
 {
 	char				*source_str;
 	size_t				source_size;
-	cl_platform_id		platform_id;
-	cl_device_id		device_id;
+	cl_platform_id		platform;
+	cl_device_id		device;
 	cl_uint				ret_num_devices;
 	cl_uint				ret_num_platforms;
 	cl_int				ret;
 	cl_context			context;
-	cl_command_queue	command_queue;
+	cl_command_queue	q;
 	cl_mem				image;
 	cl_mem				setup;
 	cl_program			program;
 	cl_kernel			kernel;
-	size_t				global_item_size[2];
-	size_t				local_item_size[2];
+	size_t				g_size[2];
+	size_t				l_size[2];
 }					t_opencl_conf;
+
+typedef struct s_conf
+{
+	void			*mlx;
+	void			*win;
+	void			*img;
+	int				*data;
+	int				bits;
+	int				pitch;
+	int				endian;
+	int				type;
+	int				perm_change;
+	int				mouse_prev_x;
+	int				mouse_prev_y;
+	double			zoom;
+	double			moveX;
+	double			moveY;
+	double			iters;
+	t_setup			*setup;
+	t_opencl_conf	*cl;
+}				t_conf;
+
+
 
 
 int		key_press(int keycode, void *param);
@@ -133,6 +137,7 @@ int		mouse_press(int button, int x, int y, void *param);
 int		paralle_fractal(t_conf* conf);
 void	render(t_conf *conf);
 int		ft_error(int err);
+void	initialize_program(t_opencl_conf *cl);
 
 
 #endif

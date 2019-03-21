@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   openCL_functions.c                                 :+:      :+:    :+:   */
+/*   cl_functions.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/21 20:05:02 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/21 21:30:29 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/21 22:41:41 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ const char * get_error_string(cl_int err)
              case -61: return "CL_INVALID_BUFFER_SIZE";
              case -62: return "CL_INVALID_MIP_LEVEL";
              case -63: return "CL_INVALID_GLOBAL_WORK_SIZE";
-             default: return "Unknown OpenCL error";
+             default: return "Unknown cl error";
          }
 }
 
@@ -121,10 +121,10 @@ void	devices() {
             free(value);
 
             // print c version supported by compiler for device
-            clGetDeviceInfo(devices[j], CL_DEVICE_OPENCL_C_VERSION, 0, NULL, &valueSize);
+            clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, 0, NULL, &valueSize);
             value = (char*) malloc(valueSize);
-            clGetDeviceInfo(devices[j], CL_DEVICE_OPENCL_C_VERSION, valueSize, value, NULL);
-            printf(" %d.%d OpenCL C version: %s\n", j+1, 3, value);
+            clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, valueSize, value, NULL);
+            printf(" %d.%d cl C version: %s\n", j+1, 3, value);
             free(value);
 
             // print support extensions
@@ -163,79 +163,57 @@ int	read_kernel(char **arr)
 	return (rd);
 }
 
-
+void	initialize_program(t_opencl_conf *cl)
+{
+	cl->source_size = read_kernel(&cl->source_str);
+	cl->ret = clGetPlatformIDs(1, &cl->platform, &cl->ret_num_platforms);
+	cl->ret = clGetDeviceIDs( cl->platform, CL_DEVICE_TYPE_GPU, 1, 
+		&cl->device, &cl->ret_num_devices);
+	cl->context = clCreateContext( NULL, 1, &cl->device, NULL, NULL, &cl->ret);
+	cl->q = clCreateCommandQueue(cl->context, cl->device, 0, &cl->ret);
+	cl->program = clCreateProgramWithSource(cl->context, 1,  (const char **)
+		&cl->source_str, (const size_t *)&cl->source_size, &cl->ret);
+	cl->ret = clBuildProgram(cl->program, 1, &cl->device, NULL, NULL, NULL);
+	cl->kernel = clCreateKernel(cl->program, "mandelbrot_set", &cl->ret);
+	cl->g_size[0] = W;
+	cl->g_size[1] = H;
+	cl->l_size[0] = 8;
+	cl->l_size[1] = 8;
+}
 
 void	render(t_conf *conf)
 {
-    // Load the kernel source code into the array source_str
-    char	*source_str;
-    size_t	source_size;
- 
-	source_size = read_kernel(&source_str);
-     // Get platform and device information
-    cl_platform_id platform_id = NULL;
-    cl_device_id device_id = NULL;   
-    cl_uint ret_num_devices;
-    cl_uint ret_num_platforms;
-    cl_int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-    ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_GPU, 1, 
-            &device_id, &ret_num_devices);
- 
-    // Create an OpenCL context
-    cl_context context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
- 
-    // Create a command queue
-    cl_command_queue command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
- 
-    // Create a program from the kernel source
-	cl_program program;
-    if (!(program = clCreateProgramWithSource(context, 1, 
-            (const char **)&source_str, (const size_t *)&source_size, &ret)))
-		printf("%s\n", get_error_string(ret));
-
- 
-    // Build the program
-    if ((ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL)))
-		printf("Error %s\n", get_error_string(ret));
- 
-    // Create the OpenCL kernel
-    cl_kernel kernel = clCreateKernel(program, "mandelbrot_set", &ret);
-
-    // Create memory buffers on the device for each vector
-    cl_mem image = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-            W * H * sizeof(int), NULL, &ret);
-    cl_mem arr = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-            sizeof(*conf->setup), NULL, &ret);
-
+/* 	conf->cl->context = clCreateContext( NULL, 1, &conf->cl->device, NULL, NULL, &conf->cl->ret);
+	conf->cl->command_queue = clCreateCommandQueue(conf->cl->context, conf->cl->device,
+		0, &conf->cl->ret);
+	conf->cl->program = clCreateProgramWithSource(conf->cl->context, 1,  (const char **)
+		&conf->cl->source_str, (const size_t *)&conf->cl->source_size, &conf->cl->ret);
+	conf->cl->ret = clBuildProgram(conf->cl->program, 1, &conf->cl->device, NULL, NULL, NULL);
+	conf->cl->kernel = clCreateKernel(conf->cl->program, "mandelbrot_set", &conf->cl->ret); */
+	conf->cl->setup = clCreateBuffer(conf->cl->context,
+	CL_MEM_READ_ONLY, sizeof(t_setup), NULL, &conf->cl->ret);
+	conf->cl->image = clCreateBuffer(conf->cl->context,
+	CL_MEM_READ_ONLY, W * H * sizeof(int), NULL, &conf->cl->ret);
     // Copy the lists A and B to their respective memory buffers
-    ret = clEnqueueWriteBuffer(command_queue, image, CL_TRUE, 0,
-            W * H * sizeof(int), conf->data, 0, NULL, NULL);
-    ret = clEnqueueWriteBuffer(command_queue, arr, CL_TRUE, 0,
-            sizeof(*conf->setup), conf->setup, 0, NULL, NULL);
-        printf("%f\n", conf->setup->iters);
-
-    // Set the arguments of the kernel
-    ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&image);
-    ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&arr);
- 
-    // Execute the OpenCL kernel on the list
-    size_t global_item_size[2] = {W, H}; // Process the entire lists
-    size_t local_item_size[2] = {8, 8}; // Divide work items into groups of 64
-    ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL, 
-            global_item_size, local_item_size, 0, NULL, NULL);
- 
-    // Read the memory buffer C on the device to the local variable C
-    ret = clEnqueueReadBuffer(command_queue, image, CL_TRUE, 0, 
-            W * H * sizeof(int), conf->data, 0, NULL, NULL);
-    // Display the result to the screen
- 
-    // Clean up
-    ret = clFlush(command_queue);
-    ret = clFinish(command_queue);
-    ret = clReleaseKernel(kernel);
-    ret = clReleaseProgram(program);
-    ret = clReleaseMemObject(image);
-	ret = clReleaseMemObject(arr);
-    ret = clReleaseCommandQueue(command_queue);
-    ret = clReleaseContext(context);
+    conf->cl->ret = clEnqueueWriteBuffer(conf->cl->q, conf->cl->image,
+	CL_TRUE, 0, W * H * sizeof(int), conf->data, 0, NULL, NULL);
+	conf->cl->ret = clEnqueueWriteBuffer(conf->cl->q, conf->cl->setup, CL_TRUE,
+	0, sizeof(t_setup), conf->setup, 0, NULL, NULL);
+	conf->cl->ret = clSetKernelArg(conf->cl->kernel, 0, sizeof(cl_mem),
+	(void *)&conf->cl->image);
+	conf->cl->ret = clSetKernelArg(conf->cl->kernel, 1, sizeof(cl_mem),
+	(void *)&conf->cl->setup);
+	conf->cl->ret = clEnqueueNDRangeKernel(conf->cl->q, conf->cl->kernel, 2,
+	NULL, conf->cl->g_size, conf->cl->l_size, 0, NULL, NULL);
+	conf->cl->ret = clEnqueueReadBuffer(conf->cl->q, conf->cl->image, CL_TRUE,
+	0, W * H * sizeof(int), conf->data, 0, NULL, NULL);
+/* 	conf->cl->ret = clFlush(conf->cl->command_queue);
+    conf->cl->ret = clFinish(conf->cl->command_queue);
+    conf->cl->ret = clReleaseKernel(conf->cl->kernel); */
+	conf->cl->ret = clReleaseMemObject(conf->cl->image);
+	conf->cl->ret = clReleaseMemObject(conf->cl->setup);
+/*     conf->cl->ret = clReleaseProgram(conf->cl->program);
+    conf->cl->ret = clReleaseCommandQueue(conf->cl->command_queue);
+    conf->cl->ret = clReleaseContext(conf->cl->context); */
+	mlx_put_image_to_window(conf->mlx, conf->win, conf->img, 0, 0);
 }
