@@ -1,16 +1,15 @@
-
 typedef struct s_setup
 {
 	double		zoom;
-	double		moveX;
-	double		moveY;
+	double		move_x;
+	double		move_y;
 	double		iters;
 	int			type;
 	double		c_r;
 	double	 	c_i;
 }				t_setup;
 
-__kernel void	mandelbrot_set(__global int *arr, __global t_setup *params)
+__kernel void	fractal(__global int *arr, __global t_setup *params)
 {
 	int		x;
 	int		y;
@@ -30,9 +29,9 @@ __kernel void	mandelbrot_set(__global int *arr, __global t_setup *params)
 	scr_w = get_global_size(0);
 	scr_h = get_global_size(1);
 	par_r = 1.5 * (x - scr_w / 2) / (0.5 * params->zoom * scr_w) +
-	params->moveX - (params->type == 2 ? 0 : 0.5);
+	params->move_x - (params->type == 2 ? 0 : 0.5);
 	par_i = (y - scr_h / 2) / (0.5 * params->zoom * scr_h)
-	+ params->moveY - (params->type == 3 ? 0.5 : 0);
+	+ params->move_y - (params->type == 3 ? 0.5 : 0);
 	i = -1;
 	new_i = par_i;
 	new_r = par_r;
@@ -49,7 +48,6 @@ __kernel void	mandelbrot_set(__global int *arr, __global t_setup *params)
 	if (i < params->iters)
 	{
 		double t = fabs((i - log(log2(mod)) / log(2.0)) / params->iters);
-		//double t = i / params->iters;
 		int	r = (int)(9 * (1 - t) * t * t * t * 255);
 		int	g = (int)( 15 * (1 - t ) * (1 - t) * t * t * 255);
 		int	b =  (int)(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255);

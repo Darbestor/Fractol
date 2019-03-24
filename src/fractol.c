@@ -6,15 +6,16 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:47:32 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/24 16:58:04 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/24 19:00:16 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/fractol.h"
+#include "../minilibx/mlx.h"
 #include "../Libft/libft.h"
-#include <unistd.h>
 #include <stdlib.h>
-t_conf	*mlx_new()
+
+t_conf	*mlx_new(void)
 {
 	t_conf *mlx;
 
@@ -52,22 +53,10 @@ int		ft_error(int err)
 	else if (err == 2)
 		write(2, "Memory allocation failure\n", 26);
 	exit(0);
-	return(0);
+	return (0);
 }
 
-/* void	*launch_fract(void *param)
-{
-
-		if (conf->type == 1)
-			mandelbrot_set(thread->conf, thread);
- 		else if (thread->conf->type == 2)
-			julia_set(conf, conf->fract);
-		else if (thread->conf->type == 3)
-			burning_ship_set(conf, conf->fract);
-	pthread_exit(0);
-} */
-
-int	init_setup(char *argv, t_setup **src)
+int		init_setup(char *argv, t_setup **src)
 {
 	t_setup *setup;
 
@@ -75,8 +64,8 @@ int	init_setup(char *argv, t_setup **src)
 		return (ft_error(2));
 	setup->iters = 300;
 	setup->zoom = 1;
-	setup->moveX = 0;
-	setup->moveY = 0;
+	setup->move_x = 0;
+	setup->move_y = 0;
 	setup->c_r = 0;
 	setup->c_i = 0;
 	if (!ft_strcmp(argv, "Mandelbrot"))
@@ -95,7 +84,7 @@ int	init_setup(char *argv, t_setup **src)
 	return (0);
 }
 
-int	main(int argc, char **argv)
+int		main(int argc, char **argv)
 {
 	t_conf		*conf;
 	t_setup		*setup;
@@ -114,7 +103,6 @@ int	main(int argc, char **argv)
 		mlx_hook(conf->win, 4, 0, &mouse_press, conf);
 		mlx_hook(conf->win, 6, 0, &mouse_move, conf);
 		mlx_loop(conf->mlx);
-
 	}
 	return (ft_error(1));
 }
