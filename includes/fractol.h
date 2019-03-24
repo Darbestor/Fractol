@@ -6,7 +6,7 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:41:42 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/21 22:48:32 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/24 14:51:17 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ typedef struct s_setup
 	double		moveY;
 	double		iters;
 	int			type;
+	double			c_r;
+	double			c_i;
 }				t_setup;
 
 typedef struct	s_opencl_conf
@@ -133,9 +135,9 @@ int		close_window(t_conf *param);
 //void	launch_fract(t_conf *conf, t_fractal *fract);
 int		mouse_press(int button, int x, int y, void *param);
 //int		HSVToRGB(t_rgb *rgb, double h, double s, double v);
-//int		mouse_move(int x, int y, void *param);
+int		mouse_move(int x, int y, void *param);
 int		paralle_fractal(t_conf* conf);
-void	render(t_conf *conf);
+int		render(void *param);
 int		ft_error(int err);
 void	initialize_program(t_opencl_conf *cl);
 

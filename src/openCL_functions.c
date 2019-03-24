@@ -173,7 +173,8 @@ void	initialize_program(t_opencl_conf *cl)
 	cl->q = clCreateCommandQueue(cl->context, cl->device, 0, &cl->ret);
 	cl->program = clCreateProgramWithSource(cl->context, 1,  (const char **)
 		&cl->source_str, (const size_t *)&cl->source_size, &cl->ret);
-	cl->ret = clBuildProgram(cl->program, 1, &cl->device, NULL, NULL, NULL);
+	if ((cl->ret = clBuildProgram(cl->program, 1, &cl->device, NULL, NULL, NULL)))
+		printf("%s\n", get_error_string(cl->ret));
 	cl->kernel = clCreateKernel(cl->program, "mandelbrot_set", &cl->ret);
 	cl->g_size[0] = W;
 	cl->g_size[1] = H;
@@ -181,21 +182,16 @@ void	initialize_program(t_opencl_conf *cl)
 	cl->l_size[1] = 8;
 }
 
-void	render(t_conf *conf)
+int	render(void *param)
 {
-/* 	conf->cl->context = clCreateContext( NULL, 1, &conf->cl->device, NULL, NULL, &conf->cl->ret);
-	conf->cl->command_queue = clCreateCommandQueue(conf->cl->context, conf->cl->device,
-		0, &conf->cl->ret);
-	conf->cl->program = clCreateProgramWithSource(conf->cl->context, 1,  (const char **)
-		&conf->cl->source_str, (const size_t *)&conf->cl->source_size, &conf->cl->ret);
-	conf->cl->ret = clBuildProgram(conf->cl->program, 1, &conf->cl->device, NULL, NULL, NULL);
-	conf->cl->kernel = clCreateKernel(conf->cl->program, "mandelbrot_set", &conf->cl->ret); */
+	t_conf	*conf;
+
+	conf = (t_conf*)param;
 	conf->cl->setup = clCreateBuffer(conf->cl->context,
 	CL_MEM_READ_ONLY, sizeof(t_setup), NULL, &conf->cl->ret);
 	conf->cl->image = clCreateBuffer(conf->cl->context,
 	CL_MEM_READ_ONLY, W * H * sizeof(int), NULL, &conf->cl->ret);
-    // Copy the lists A and B to their respective memory buffers
-    conf->cl->ret = clEnqueueWriteBuffer(conf->cl->q, conf->cl->image,
+	conf->cl->ret = clEnqueueWriteBuffer(conf->cl->q, conf->cl->image,
 	CL_TRUE, 0, W * H * sizeof(int), conf->data, 0, NULL, NULL);
 	conf->cl->ret = clEnqueueWriteBuffer(conf->cl->q, conf->cl->setup, CL_TRUE,
 	0, sizeof(t_setup), conf->setup, 0, NULL, NULL);
@@ -207,13 +203,8 @@ void	render(t_conf *conf)
 	NULL, conf->cl->g_size, conf->cl->l_size, 0, NULL, NULL);
 	conf->cl->ret = clEnqueueReadBuffer(conf->cl->q, conf->cl->image, CL_TRUE,
 	0, W * H * sizeof(int), conf->data, 0, NULL, NULL);
-/* 	conf->cl->ret = clFlush(conf->cl->command_queue);
-    conf->cl->ret = clFinish(conf->cl->command_queue);
-    conf->cl->ret = clReleaseKernel(conf->cl->kernel); */
 	conf->cl->ret = clReleaseMemObject(conf->cl->image);
 	conf->cl->ret = clReleaseMemObject(conf->cl->setup);
-/*     conf->cl->ret = clReleaseProgram(conf->cl->program);
-    conf->cl->ret = clReleaseCommandQueue(conf->cl->command_queue);
-    conf->cl->ret = clReleaseContext(conf->cl->context); */
 	mlx_put_image_to_window(conf->mlx, conf->win, conf->img, 0, 0);
+	return (0);
 }

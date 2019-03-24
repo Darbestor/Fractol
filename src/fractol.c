@@ -6,7 +6,7 @@
 /*   By: ghalvors <ghalvors@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:47:32 by ghalvors          #+#    #+#             */
-/*   Updated: 2019/03/21 22:45:18 by ghalvors         ###   ########.fr       */
+/*   Updated: 2019/03/24 16:58:04 by ghalvors         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,16 @@ int	init_setup(char *argv, t_setup **src)
 	setup->zoom = 1;
 	setup->moveX = 0;
 	setup->moveY = 0;
+	setup->c_r = 0;
+	setup->c_i = 0;
 	if (!ft_strcmp(argv, "Mandelbrot"))
 		setup->type = 1;
 	else if (!ft_strcmp(argv, "Julia"))
+	{
 		setup->type = 2;
+		setup->c_r = 0.285;
+		setup->c_i = 0.00001;
+	}
 	else if (!ft_strcmp(argv, "Burningship"))
 		setup->type = 3;
 	else
@@ -101,16 +107,14 @@ int	main(int argc, char **argv)
 			return (ft_error(2));
 		init_setup(argv[1], &setup);
 		conf->setup = setup;
-//		conf->c_r = -0.7;
-//		conf->c_i = 0.3015;
-		//devices();
 		initialize_program(conf->cl);
 		render(conf);
 		mlx_hook(conf->win, 2, 0, &key_press, conf);
 		mlx_hook(conf->win, 17, 0, &close_window, conf);
 		mlx_hook(conf->win, 4, 0, &mouse_press, conf);
-//		mlx_hook(conf->win, 6, 0, &mouse_move, conf);
+		mlx_hook(conf->win, 6, 0, &mouse_move, conf);
 		mlx_loop(conf->mlx);
+
 	}
 	return (ft_error(1));
 }
